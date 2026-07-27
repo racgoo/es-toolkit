@@ -4,6 +4,7 @@ import { toArray } from '../_internal/toArray.ts';
 import { property } from '../object/property.ts';
 import { matches } from '../predicate/matches.ts';
 import { matchesProperty } from '../predicate/matchesProperty.ts';
+import { toInteger } from '../util/toInteger.ts';
 
 /**
  * Finds the index of the last element in the array that satisfies the predicate.
@@ -61,10 +62,12 @@ export function findLastIndex<T>(
   if (!arr) {
     return -1;
   }
-  if (Number.isNaN(fromIndex)) {
-    fromIndex = 0;
-  }
-  if (fromIndex < 0) {
+
+  // Lodash checks the sign before coercion: `-0.5` is negative but `toInteger` makes it `0`.
+  const isNegative = fromIndex < 0;
+
+  fromIndex = toInteger(fromIndex);
+  if (isNegative) {
     fromIndex = Math.max(arr.length + fromIndex, 0);
   } else {
     fromIndex = Math.min(fromIndex, arr.length - 1);
